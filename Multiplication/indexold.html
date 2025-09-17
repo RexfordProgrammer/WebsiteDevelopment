@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multiplication Practice — Rexford Dorchester</title>
+
+  <style>
+    /* =========================
+       Theme & Resets
+       ========================= */
+    :root {
+      --bg: #000000;
+      --fg: #ebf0f7;
+      --muted: #a7b4c2;
+      --card: #131a22;
+      --accent: #6aa8ff;
+
+      /* Buttons (animated gradient) */
+      --btn-from: #232b5d;
+      --btn-to: #2216c4;
+      --btn-hover-from: #2e5cff;
+      --btn-hover-to: #2216c4;
+
+      /* Shadows & radii */
+      --radius: 1.1rem;
+      --shadow-lg: 0 10px 24px rgba(0, 0, 0, .35);
+      --ring: 0 0 0 3px #2e5cff66;
+
+      /* Navbar */
+      --nav-h: 64px;
+      --nav-maxw: 1100px;
+      --nav-padX: clamp(12px, 4vw, 28px);
+      --nav-bg: rgba(11, 16, 32, .78);
+      --nav-border: #ffffff1a;
+      --nav-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+      --nav-blur: 10px;
+    }
+
+    @property --btn-from {
+      syntax: '<color>';
+      inherits: true;
+      initial-value: #232b5d;
+    }
+
+    @property --btn-to {
+      syntax: '<color>';
+      inherits: true;
+      initial-value: #2216c4;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    html,
+    body {
+      overflow-x: clip;
+    }
+
+    @supports not (overflow:clip) {
+
+      html,
+      body {
+        overflow-x: hidden;
+      }
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      line-height: 1.55;
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    #app {
+      position: relative;
+      isolation: isolate;
+    }
+
+    /* Links */
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    a:focus-visible {
+      outline: none;
+      box-shadow: var(--ring);
+      border-radius: 8px;
+    }
+
+    /* =========================
+       Futuristic Background
+       ========================= */
+    .futuristic-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+      --bg-grad: radial-gradient(140vw 120vh at 10% 10%, #070a12 20%, #0b1020 60%, #0a0f1c 100%);
+      --grain: radial-gradient(circle, #ffffff0c 0 1px, transparent 1px);
+      background-image:
+        var(--bg-grad),
+        var(--grain), var(--grain), var(--grain),
+        radial-gradient(140vw 120vh at 50% 120%, #000000cc, transparent 60%);
+      background-size: 100% 100%, 4px 4px, 3px 3px, 2px 2px, 100% 100%;
+      background-blend-mode: normal, lighten, lighten, lighten, multiply;
+    }
+
+    .futuristic-bg::before,
+    .futuristic-bg::after {
+      content: "";
+      position: absolute;
+      inset: -20vmax;
+      filter: blur(60px) saturate(120%);
+      mix-blend-mode: screen;
+      opacity: .75;
+    }
+
+    .futuristic-bg::before {
+      background: conic-gradient(from var(--angle, 0deg) at 30% 40%, #00e5ff33, #7cffea55, #9b5eff55, #00e5ff33);
+      animation: rotate 32s linear infinite, drift 18s ease-in-out infinite alternate;
+    }
+
+    .futuristic-bg::after {
+      background:
+        radial-gradient(45% 45% at 70% 60%, #ff6bd655 0%, transparent 60%),
+        radial-gradient(35% 35% at 20% 80%, #4ef0a655 0%, transparent 60%),
+        radial-gradient(60% 60% at 80% 20%, #6aa8ff44 0%, transparent 60%);
+      animation: drift 26s ease-in-out infinite alternate;
+    }
+
+    @keyframes rotate {
+      to {
+        --angle: 360deg;
+      }
+    }
+
+    @keyframes drift {
+      0% {
+        transform: translate3d(-2%, -1%, 0) scale(1.05);
+      }
+
+      100% {
+        transform: translate3d(2%, 1%, 0) scale(1.1);
+      }
+    }
+
+    /* =========================
+       Navbar
+       ========================= */
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: -999px;
+    }
+
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+      z-index: 9999;
+      padding: .5rem .75rem;
+      border-radius: .5rem;
+      background: #000;
+      color: #fff;
+      outline: 2px solid var(--accent);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+      height: var(--nav-h);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      padding: 0 var(--nav-padX);
+      border-bottom: 1px solid var(--nav-border);
+      background: var(--nav-bg);
+      backdrop-filter: blur(var(--nav-blur)) saturate(120%);
+      -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(120%);
+    }
+
+    .topbar.scrolled {
+      box-shadow: var(--nav-shadow);
+    }
+
+    .brand {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+
+    .topnav {
+      margin-left: auto;
+      display: flex;
+      gap: .25rem;
+      align-items: center;
+      max-width: var(--nav-maxw);
+    }
+
+    .topnav-link {
+      display: inline-block;
+      padding: .45rem .75rem;
+      border-radius: .6rem;
+      text-decoration: none;
+      color: #dbe7ff;
+      border: 1px solid transparent;
+      transition: background .2s, border-color .2s, color .2s, transform .2s;
+    }
+
+    .topnav-link:hover {
+      border-color: color-mix(in oklab, var(--accent) 60%, transparent);
+      background: color-mix(in oklab, var(--accent) 12%, transparent);
+    }
+
+    .topnav-link.active {
+      color: #fff;
+      border-color: color-mix(in oklab, var(--accent) 70%, transparent);
+      background: color-mix(in oklab, var(--accent) 24%, transparent);
+    }
+
+    /* =========================
+       Page layout
+       ========================= */
+    .page {
+      width: min(1100px, 100% - 2rem);
+      margin: calc(var(--nav-h) + 16px) auto 3rem;
+    }
+
+    .page-header {
+      margin: 0 0 .75rem;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: clamp(1.4rem, 1.2rem + 1.2vw, 2rem);
+    }
+
+    .page-subtitle {
+      margin: .25rem 0 0;
+      opacity: .85;
+    }
+
+    /* =========================
+       Card / Controls
+       ========================= */
+    .card {
+      background: color-mix(in oklab, #0b1020 86%, #ffffff 6%);
+      border: 1px solid #ffffff1a;
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      padding: 20px;
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+    }
+
+    .glow {
+      text-shadow: 0 0 12px #6aa8ff66, 0 0 32px #00e5ff33;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    label {
+      color: var(--muted);
+    }
+
+    select,
+    input[type="number"] {
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      background: #0b1220;
+      color: var(--fg);
+      padding: 8px 10px;
+    }
+
+    input[type="number"] {
+      width: 110px;
+    }
+
+    .btn {
+      --_from: var(--btn-from);
+      --_to: var(--btn-to);
+      display: inline-block;
+      background: linear-gradient(90deg, var(--_from), var(--_to));
+      color: #fff;
+      padding: .7em 1.2em;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 0 8px #2e5cff88;
+      cursor: pointer;
+      transition: --btn-from .35s ease, --btn-to .35s ease, box-shadow .35s ease, transform .2s ease;
+    }
+
+    .btn:hover {
+      --btn-from: var(--btn-hover-from);
+      --btn-to: var(--btn-hover-to);
+      box-shadow: 0 0 16px #2e5cff99;
+      transform: translateY(-1px);
+    }
+
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: var(--ring), 0 0 16px #2e5cff99;
+    }
+
+    .btn--ghost {
+      background: transparent;
+      border: 1px solid #374151;
+      box-shadow: none;
+    }
+
+    .btn--ghost:hover {
+      border-color: #6aa8ff88;
+      background: #6aa8ff1a;
+      transform: none;
+    }
+
+    .chip {
+      border: 1px solid #334155;
+      background: #0b1220;
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+
+    .prompt {
+      font-size: clamp(26px, 4.2vw, 36px);
+      font-weight: 800;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .answer-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    .answer-row input {
+      font-size: 20px;
+      width: 160px;
+      text-align: center;
+    }
+
+    .feedback {
+      min-height: 24px;
+      margin: 8px 0;
+      font-weight: 600;
+    }
+
+    .feedback.ok {
+      color: #22c55e;
+    }
+
+    .feedback.bad {
+      color: #ef4444;
+    }
+
+    .summary {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .textbox {
+      white-space: pre-wrap;
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 12px;
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .spacer {
+      height: 10px;
+    }
+
+    /* Small screens */
+    @media (max-width:480px) {
+      .answer-row input {
+        width: 130px;
+      }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="futuristic-bg" aria-hidden="true"></div>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="topbar" role="banner">
+      <a class="brand glow" href="/">Rexford Dorchester</a>
+      <nav class="topnav" aria-label="Primary">
+        <a class="topnav-link" href="/">Home</a>
+        <a class="topnav-link" href="/CAD/">CAD Gallery</a>
+        <a class="topnav-link" href="/Code/">Code Samples</a>
+        <a class="topnav-link active" href="/Multiplication/">Multiplication</a>
+      </nav>
+    </header>
+
+    <main id="content" class="page">
+      <header class="page-header">
+        <h1 class="page-title glow">Times Tables Trainer (1–12)</h1>
+        <p class="page-subtitle">Speed + accuracy tracker with persistent stats (localStorage).</p>
+      </header>
+
+      <div class="card">
+        <div class="row" role="group" aria-label="Controls">
+          <label for="mode">Mode</label>
+          <select id="mode" aria-label="Mode">
+            <option value="mixed" selected>mixed</option>
+            <option value="wrong">wrong</option>
+            <option value="slow">slow</option>
+          </select>
+
+          <label for="count">Count</label>
+          <input id="count" type="number" min="1" max="144" value="24" />
+
+          <button id="startBtn" class="btn">Start Quiz</button>
+          <button id="statsBtn" class="btn btn--ghost">Stats</button>
+          <button id="initBtn" class="btn btn--ghost" title="Initialize or re-seed the local database">Init DB</button>
+          <button id="resetBtn" class="btn btn--ghost" title="Clear attempts but keep facts">Reset Attempts</button>
+
+          <span class="chip" id="persistenceInfo" title="Storage backend">Storage: localStorage</span>
+        </div>
+
+        <div class="prompt" id="prompt">Press “Start Quiz” to begin</div>
+
+        <div class="answer-row">
+          <label for="answer">Answer</label>
+          <input id="answer" type="number" inputmode="numeric" />
+          <button id="submitBtn" class="btn">Submit</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+        <div id="summary" class="summary">Session: 0/0 correct | Avg: – ms | Best: – ms | Slowest: – ms</div>
+        <div class="spacer"></div>
+        <div id="log" class="textbox" aria-live="polite"></div>
+      </div>
+
+      <p class="muted" style="margin-top:10px">All data is stored locally in your browser.</p>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const DB_KEY = 'times_tables_db_v1';
+
+      function seedFacts() {
+        const facts = [];
+        let id = 1;
+        for (let a = 1; a <= 12; a++) {
+          for (let b = 1; b <= 12; b++) {
+            facts.push({
+              id: id++, a, b, product: a * b,
+              attempts: 0, correct: 0,
+              last_correct: null, sum_ms: 0, best_ms: null
+            });
+          }
+        }
+        return { facts };
+      }
+
+      function loadDB() {
+        const raw = localStorage.getItem(DB_KEY);
+        if (!raw) {
+          const seeded = seedFacts();
+          localStorage.setItem(DB_KEY, JSON.stringify(seeded));
+          return seeded;
+        }
+        try { return JSON.parse(raw); } catch {
+          const seeded = seedFacts();
+          localStorage.setItem(DB_KEY, JSON.stringify(seeded));
+          return seeded;
+        }
+      }
+
+      function saveDB(db) {
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+      }
+
+      function resetAttempts() {
+        const db = loadDB();
+        for (const f of db.facts) {
+          f.attempts = 0; f.correct = 0; f.last_correct = null; f.sum_ms = 0; f.best_ms = null;
+        }
+        saveDB(db);
+      }
+
+      function initDB() {
+        const db = seedFacts();
+        saveDB(db);
+      }
+
+      function avgMs(f) { return f.attempts ? Math.round(f.sum_ms / f.attempts) : null; }
+
+      function fetchStats() {
+        const db = loadDB();
+        const stats = db.facts.map(f => ({
+          id: f.id, a: f.a, b: f.b, product: f.product,
+          attempts: f.attempts, correct: f.correct,
+          ever_correct: f.correct > 0 ? 1 : 0,
+          avg_ms: avgMs(f), best_ms: f.best_ms,
+          last_correct: f.last_correct
+        }));
+        return stats;
+      }
+
+      function recordAttempt(factId, isCorrect, elapsedMs) {
+        const db = loadDB();
+        const f = db.facts.find(x => x.id === factId);
+        if (!f) return;
+        f.attempts += 1;
+        if (isCorrect) f.correct += 1;
+        f.last_correct = isCorrect ? 1 : 0;
+        f.sum_ms += Math.max(0, Math.floor(elapsedMs));
+        if (f.best_ms === null || elapsedMs < f.best_ms) { f.best_ms = Math.max(0, Math.floor(elapsedMs)); }
+        saveDB(db);
+      }
+
+      function chooseQuestions(mode, count) {
+        const stats = fetchStats();
+        const copy = s => JSON.parse(JSON.stringify(s));
+        if (mode === 'wrong') {
+          const pool = stats.filter(s => (s.last_correct === 0 || s.last_correct === null));
+          shuffle(pool);
+          return pool.slice(0, count || pool.length).map(copy);
+        } else if (mode === 'slow') {
+          const withAvg = stats.filter(s => s.avg_ms !== null).sort((a, b) => b.avg_ms - a.avg_ms);
+          const noAvg = stats.filter(s => s.avg_ms === null);
+          const pool = withAvg.concat(noAvg);
+          return pool.slice(0, count || pool.length).map(copy);
+        } else if (mode === 'mixed') {
+          const wrong = stats.filter(s => (s.last_correct === 0 || s.last_correct === null));
+          shuffle(wrong);
+          const withAvg = stats.filter(s => s.avg_ms !== null).sort((a, b) => b.avg_ms - a.avg_ms);
+          const noAvg = stats.filter(s => s.avg_ms === null);
+          const slow = withAvg.concat(noAvg);
+          const selected = [], seen = new Set();
+          const half = count ? Math.floor(count / 2) : 24;
+          for (const s of wrong.slice(0, half)) {
+            if (!seen.has(s.id)) { selected.push(s); seen.add(s.id); }
+          }
+          const target = count || 48;
+          for (const s of slow) {
+            if (selected.length >= target) break;
+            if (!seen.has(s.id)) { selected.push(s); seen.add(s.id); }
+          }
+          return selected.map(copy);
+        }
+        return [];
+      }
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      // --- UI wiring ---
+      const els = {
+        mode: document.getElementById('mode'),
+        count: document.getElementById('count'),
+        startBtn: document.getElementById('startBtn'),
+        statsBtn: document.getElementById('statsBtn'),
+        initBtn: document.getElementById('initBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        prompt: document.getElementById('prompt'),
+        answer: document.getElementById('answer'),
+        submitBtn: document.getElementById('submitBtn'),
+        feedback: document.getElementById('feedback'),
+        summary: document.getElementById('summary'),
+        log: document.getElementById('log'),
+        storageBadge: document.getElementById('persistenceInfo'),
+      };
+
+      let currentQuestions = [];
+      let currentIndex = -1;
+      let startTick = null;
+      let sessionTimes = [];
+      let sessionCorrect = 0;
+
+      function setPrompt(text) { els.prompt.textContent = text; }
+      function setFeedback(text, ok) {
+        els.feedback.textContent = text || '';
+        els.feedback.classList.toggle('ok', !!ok);
+        els.feedback.classList.toggle('bad', text && !ok);
+      }
+      function appendLog(line, clear = false) {
+        if (clear) els.log.textContent = '';
+        els.log.textContent += (line.endsWith('\n') ? line : line + '\n');
+        els.log.scrollTop = els.log.scrollHeight;
+      }
+      function setSummary() {
+        if (sessionTimes.length) {
+          const avg = Math.round(sessionTimes.reduce((a, b) => a + b, 0) / sessionTimes.length);
+          const best = Math.min(...sessionTimes);
+          const worst = Math.max(...sessionTimes);
+          els.summary.textContent = `Session: ${sessionCorrect}/${sessionTimes.length} correct | Avg: ${avg} ms | Best: ${best} ms | Slowest: ${worst} ms`;
+        } else {
+          els.summary.textContent = `Session: 0/0 correct | Avg: – ms | Best: – ms | Slowest: – ms`;
+        }
+      }
+
+      function startQuiz() {
+        const mode = els.mode.value;
+        let count = parseInt(els.count.value, 10);
+        if (!Number.isFinite(count) || count < 1) count = 24;
+        const qs = chooseQuestions(mode, count);
+        if (!qs.length) {
+          alert('No questions found for this mode. Try "slow" or "mixed" after a few attempts.');
+          return;
+        }
+        currentQuestions = qs;
+        currentIndex = -1;
+        sessionTimes = [];
+        sessionCorrect = 0;
+        appendLog(`Mode: ${mode} | Questions: ${qs.length}`, true);
+        setFeedback('');
+        nextQuestion();
+      }
+
+      function nextQuestion() {
+        currentIndex += 1;
+        if (currentIndex >= currentQuestions.length) {
+          setPrompt('Done! Start another quiz or check stats.');
+          setFeedback('');
+          return;
+        }
+        const q = currentQuestions[currentIndex];
+        setPrompt(`${q.a} × ${q.b} =`);
+        els.answer.value = '';
+        els.answer.focus();
+        startTick = performance.now();
+      }
+
+      function submitAnswer() {
+        if (currentIndex < 0 || currentIndex >= currentQuestions.length) return;
+        const q = currentQuestions[currentIndex];
+        const userRaw = (els.answer.value || '').trim();
+        const user = Number(userRaw);
+        const elapsed = Math.max(0, Math.round(performance.now() - (startTick || performance.now())));
+        sessionTimes.push(elapsed);
+
+        const correct = Number.isFinite(user) && user === q.product;
+        recordAttempt(q.id, correct, elapsed);
+        if (correct) {
+          setFeedback(`✅ Correct (${elapsed} ms)`, true);
+          sessionCorrect += 1;
+          appendLog(`${q.a} × ${q.b} = ${q.product}  ✓ ${elapsed} ms`);
+        } else {
+          setFeedback(`❌ ${q.a} × ${q.b} = ${q.product} (you: ${userRaw || '∅'}) [${elapsed} ms]`, false);
+          appendLog(`${q.a} × ${q.b} = ${q.product}  ✗ you: ${JSON.stringify(userRaw)}  ${elapsed} ms`);
+        }
+        setSummary();
+        setTimeout(nextQuestion, 120);
+      }
+
+      function buildStatsText() {
+        const stats = fetchStats();
+        const total = stats.length;
+        const attempted = stats.filter(s => s.attempts > 0).length;
+        const mastered = stats.filter(s => s.ever_correct === 1).length;
+        const allTimes = [];
+        for (const s of stats) {
+          for (let i = 0; i < s.attempts; i++) {
+            if (s.avg_ms !== null) { allTimes.push(s.avg_ms); break; }
+          }
+        }
+        let lines = [];
+        lines.push('=== Overall Stats ===');
+        lines.push(`Facts total: ${total}`);
+        lines.push(`Attempted : ${attempted}`);
+        lines.push(`Ever correct on: ${mastered}`);
+        if (allTimes.length) {
+          const overallAvg = Math.round(allTimes.reduce((a, b) => a + b, 0) / allTimes.length);
+          lines.push(`Overall avg time: ${overallAvg} ms | Best: ${minStat(stats, 'best_ms')} ms | Slowest: ${maxStat(stats, 'avg_ms')} ms`);
+        } else {
+          lines.push('No timing yet.');
+        }
+
+        const withAvg = stats.filter(s => s.avg_ms !== null).sort((a, b) => b.avg_ms - a.avg_ms).slice(0, 10);
+        lines.push('\n=== Slowest 10 (by average ms) ===');
+        if (!withAvg.length) {
+          lines.push('No attempts yet.');
+        } else {
+          for (const s of withAvg) {
+            const last = s.last_correct === 1 ? '✔' : s.last_correct === 0 ? '✖' : '-';
+            lines.push(`${s.a} x ${s.b}: avg ${s.avg_ms} ms | best ${s.best_ms ?? '–'} ms | attempts ${s.attempts} | last ${last}`);
+          }
+        }
+
+        const missed = stats.filter(s => (s.last_correct === 0 || s.last_correct === null));
+        lines.push(`\nNeed work (last wrong or never tried): ${missed.length}`);
+        if (missed.length) {
+          const preview = missed.slice(0, 20).map(m => `${m.a}×${m.b}`).join(', ');
+          lines.push(`  e.g., ${preview}${missed.length > 20 ? '…' : ''}`);
+        }
+        return lines.join('\n') + '\n';
+
+        function minStat(list, key) {
+          const vals = list.map(s => s[key]).filter(v => typeof v === 'number');
+          return vals.length ? Math.min(...vals) : '–';
+        }
+        function maxStat(list, key) {
+          const vals = list.map(s => s[key]).filter(v => typeof v === 'number');
+          return vals.length ? Math.max(...vals) : '–';
+        }
+      }
+
+      // Event wiring
+      els.startBtn.addEventListener('click', startQuiz);
+      els.submitBtn.addEventListener('click', submitAnswer);
+      els.answer.addEventListener('keydown', (e) => { if (e.key === 'Enter') { submitAnswer(); } });
+      els.statsBtn.addEventListener('click', () => { appendLog(buildStatsText(), true); });
+      els.initBtn.addEventListener('click', () => {
+        if (confirm('Initialize DB? This reseeds facts and clears attempts.')) { initDB(); alert('Initialized.'); }
+      });
+      els.resetBtn.addEventListener('click', () => {
+        if (confirm('Clear all attempts (keep facts)?')) { resetAttempts(); alert('Attempts cleared.'); }
+      });
+
+      // First boot
+      loadDB();
+      appendLog('Welcome! Click Start Quiz or Stats to begin.');
+
+      // Add scroll shadow to navbar
+      const topbar = document.querySelector('.topbar');
+      const onScroll = () => topbar.classList.toggle('scrolled', window.scrollY > 2);
+      onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+    })();
+  </script>
+</body>
+
+</html>
